@@ -6,9 +6,27 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "qa:visual": "node scripts/visual-qa.mjs",
+    "qa:interaction": "node scripts/interaction-qa.mjs",
+    "qa:routes": "node scripts/route-audit.mjs",
+    "qa:motion": "node scripts/motion-audit.mjs",
+    "qa:contrast": "node scripts/contrast-audit.mjs",
+    "qa:security": "node scripts/security-audit.mjs",
+    "qa:assets": "node scripts/asset-audit.mjs",
+    "qa:keyboard": "node scripts/keyboard-audit.mjs",
+    "qa:deadcode": "node scripts/dead-code-audit.mjs",
+    "qa:packages": "node scripts/package-audit.mjs",
+    "qa:overflow": "node scripts/overflow-audit.mjs",
+    "qa:vitals": "node scripts/vitals.mjs",
+    "qa:all": "npm run qa:packages && npm run qa:deadcode && npm run qa:security && npm run qa:assets && npm run qa:contrast && npm run qa:keyboard && npm run qa:routes && npm run qa:motion && npm run qa:overflow && npm run qa:interaction && npm run qa:vitals",
+    "qa:shoot": "node scripts/shoot.mjs",
+    "qa:serve": "node scripts/serve-qa.mjs"
   },
   "dependencies": {
+    "lucide-react": "^1.48.0",
+    "motion": "^13.4.4",
     "next": "16.3.6",
     "react": "19.2.8",
     "react-dom": "19.2.8"
@@ -20,6 +38,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
+    "playwright-core": "^1.63.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
