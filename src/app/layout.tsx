@@ -4,6 +4,9 @@ import { MotionProvider } from "@/components/layout/MotionProvider";
 import { involve, switzer } from "@/styles/fonts";
 import { siteConfig } from "@/config/site";
 
+/** Social share card. Must resolve to a file that exists in `public/`. */
+const OG_IMAGE = "/images/hero/hero_bg_demo.jpg";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
@@ -33,7 +36,7 @@ export const metadata: Metadata = {
     locale: siteConfig.locale,
     images: [
       {
-        url: "/images/hero/hero-bg.jpg",
+        url: OG_IMAGE,
         width: 1920,
         height: 1080,
         alt: `${siteConfig.name} — landmark real estate development`,
@@ -44,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${siteConfig.name} – ${siteConfig.tagline}`,
     description: siteConfig.description,
-    images: ["/images/hero/hero-bg.jpg"],
+    images: [OG_IMAGE],
   },
   robots: {
     index: true,
@@ -63,11 +66,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${switzer.variable} ${involve.variable} antialiased`}
-      suppressHydrationWarning
-    >
+    // No `suppressHydrationWarning`: the font class names come from a build-time
+    // hash and are identical on both sides of hydration, and every other value
+    // here is static. Suppressing it would only hide a real mismatch if one
+    // were ever introduced.
+    <html lang="en" className={`${switzer.variable} ${involve.variable} antialiased`}>
       <body className="flex min-h-dvh flex-col bg-canvas">
         <a
           href="#main"
