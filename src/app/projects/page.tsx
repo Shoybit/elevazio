@@ -18,13 +18,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/projects" },
 };
 
-const categoryById: Record<string, string> = {
-  "apartment-building": "Residential",
-  "eden-estate": "Residential",
-  "councill-square": "Mixed use",
-  "office-building": "Commercial",
-};
-
 export default function ProjectsPage() {  return (
     <PageShell
       eyebrow="selected projects"
@@ -54,7 +47,7 @@ export default function ProjectsPage() {  return (
                       className="object-cover transition-transform duration-[1.4s] ease-out-expo group-hover:scale-105"
                     />
                     <span className="absolute left-5 top-5 rounded-full bg-canvas/95 px-4 py-1.5 text-eyebrow font-semibold uppercase">
-                      {categoryById[project.id]}
+                      {project.category}
                     </span>
                     <span className="absolute bottom-5 right-5 flex size-11 items-center justify-center rounded-full bg-primary text-accent transition-transform duration-500 ease-out-expo group-hover:rotate-45">
                       <ArrowUpRight aria-hidden className="size-4" />
