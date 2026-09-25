@@ -104,7 +104,7 @@ export function Intro() {
                 fill
                 loading="lazy"
                 sizes="(max-width: 1023px) 100vw, 45vw"
-                className="object-fit transition-transform duration-[1.4s] ease-[var(--ease-out-expo)] hover:scale-105"
+                className="object-cover transition-transform duration-[1.4s] ease-[var(--ease-out-expo)] hover:scale-105"
               />
             </div>
           </Reveal>
@@ -124,7 +124,7 @@ export function Intro() {
                 fill
                 loading="lazy"
                 sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 24vw"
-                className="object-fit transition-transform duration-[1.4s] ease-[var(--ease-out-expo)] hover:scale-105"
+                className="object-cover transition-transform duration-[1.4s] ease-[var(--ease-out-expo)] hover:scale-105"
               />
             </Reveal>
           </ul>

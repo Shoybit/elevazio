@@ -68,7 +68,7 @@ export function Testimonials() {
               alt=""
               fill
               sizes="112px"
-              className="object-fit"
+              className="object-cover"
             />
           </div>
         </div>

@@ -53,10 +53,13 @@ function ProjectPanel({
             src={project.image}
             alt={`${project.title} — ${project.location}`}
             fill
-            priority={index === 0}
+            // `preload` replaces the deprecated `priority` prop. Only the first
+            // panel is preloaded; the rest stay lazy, so the landing page does
+            // not compete with itself for bandwidth.
+            preload={index === 0}
             loading={index === 0 ? undefined : "lazy"}
             sizes="(max-width: 1023px) 100vw, 50vw"
-            className="object-fit"
+            className="object-cover"
           />
         </motion.div>
         {/* Softens the seam where the next panel slides over this one. */}

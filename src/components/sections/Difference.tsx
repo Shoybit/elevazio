@@ -40,7 +40,7 @@ export function Difference() {
               fill
               loading="lazy"
               sizes="(max-width: 1023px) 100vw, 45vw"
-              className="object-fit"
+              className="object-cover"
             />
           </motion.div>
           <div
