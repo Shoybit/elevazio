@@ -63,13 +63,13 @@ export interface Pillar {
 
 export const introPillars: Pillar[] = [
   {
-    title: "To empower businesses with innovative web solutions that drive digital growth.",
+    title: "Develop the sites others walk past.",
     description:
-      "Our solutions are built for modern enterprises, helping them thrive in today’s competitive digital landscape.",
+      "We acquire, entitle and build on the neighbourhoods with the strongest long-term fundamentals — and hold each one to the same standard.",
   },
   {
-    title: "Explore premier real estate development services.",
+    title: "One in-house team, from sketch to handover.",
     description:
-      "3k+ satisfied customers across residential, commercial, and mixed-use developments.",
+      "3,000+ professionals across residential, commercial and mixed-use delivery, so accountability never changes hands mid-project.",
   },
 ];
