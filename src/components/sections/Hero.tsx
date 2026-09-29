@@ -112,7 +112,11 @@ export function Hero() {
           src="/images/hero/hero_bg_demo.jpg"
           alt=""
           fill
-          priority
+          // `preload` is the Next.js 16 replacement for the deprecated
+          // `priority` prop (`preload: preload || priority` in get-img-props);
+          // it is what puts the LCP image in the `<head>`. The explicit
+          // `fetchPriority` hint is kept on top of it.
+          preload
           fetchPriority="high"
           sizes="100vw"
           className="object-cover"

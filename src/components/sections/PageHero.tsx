@@ -37,7 +37,10 @@ export function PageHero({
           src={image}
           alt={imageAlt}
           fill
-          priority
+          // Next.js 16 replacement for the deprecated `priority` prop; the
+          // explicit hint tells the browser to fetch it ahead of everything
+          // else on an inner page.
+          preload
           fetchPriority="high"
           sizes="100vw"
           className="object-cover"

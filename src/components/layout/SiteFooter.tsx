@@ -47,7 +47,7 @@ export function SiteFooter() {
           src="/images/hero/bg_footer.jpg"
           alt=""
           fill
-          priority
+          preload
           sizes="100vw"
           className="
             object-cover
