@@ -16,7 +16,13 @@
   /* -- Ink --------------------------------------------------------------- */
   --color-accent: #000000;
   --color-ink: #4b4b4b;
-  --color-ink-light: #8a8a8a;
+  /* Secondary copy. The original #8a8a8a measured 3.45:1 on `--color-canvas`
+     and 3.12:1 on `--color-surface-warm`, which fails WCAG 2.1 AA (4.5:1) for
+     body text. #6e6e6e clears AA on all three light surfaces (5.10 / 4.60 /
+     4.68) while keeping the same neutral grey character. Revert to #8a8a8a
+     only if the lighter tone is a hard brand requirement and the contrast
+     trade-off is accepted. */
+  --color-ink-light: #6e6e6e;
 
   /* -- Surfaces ---------------------------------------------------------- */
   --color-canvas: #ffffff;
@@ -95,37 +101,28 @@
   --text-colhead--line-height: 1.556;
   --text-colhead--font-weight: 600;
 
-  /* -- Radii ------------------------------------------------------------- */
-  --radius-xs: 0.625rem;
-  --radius-sm: 0.75rem;
+  /* -- Radii -------------------------------------------------------------
+     Only the values the design actually uses. `--radius-md/lg/xl/2xl` override
+     Tailwind's defaults to the reference's scale, so they stay; `--radius-xs`,
+     `--radius-sm` and `--radius-header` had no consumer and were dropped
+     rather than left as a decoy. `npm run qa:deadcode` reports any token that
+     stops emitting a utility. */
   --radius-md: 1.25rem;
   --radius-lg: 1.5625rem;
   --radius-xl: 1.875rem;
   --radius-2xl: 2.5rem;
-  --radius-header: 5rem;
   --radius-footer: 5rem;
 
-  /* -- Motion ------------------------------------------------------------ */
+  /* -- Motion ------------------------------------------------------------- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
 
-  --animate-marquee: marquee var(--marquee-duration, 30s) linear infinite;
-  --animate-marquee-pill: marquee-pill var(--marquee-duration, 10s) linear
-    infinite;
-  --animate-spin-slow: spin 24s linear infinite;
+  /* Duration is supplied per element via an inline `animation-duration`; see
+     the note above `@keyframes marquee` for why a custom property here would
+     not reach the shorthand. */
+  --animate-marquee: marquee 30s linear infinite;
 }
 
 @keyframes marquee {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-@keyframes marquee-pill {
   from {
     transform: translate3d(0, 0, 0);
   }
@@ -280,18 +277,6 @@
   text-transform: uppercase;
 }
 
-/* Horizontal marquee viewport: hides overflow while children animate. */
-@utility marquee-mask {
-  overflow: hidden;
-  mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    #000 8%,
-    #000 92%,
-    transparent 100%
-  );
-}
-
 /* Faint outlined numerals used as decorative project indexes. */
 @utility text-outline-dark {
   color: transparent;
@@ -315,6 +300,9 @@
    render) so the server and client always emit identical markup, and in JS
    through <MotionConfig reducedMotion="user">. The rules below neutralise the
    transform-based animation helpers.
+
+   The `!important` overrides are deliberate: the reduced-motion block must win
+   over the marquee's `animation-duration`, which callers set inline.
    ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
