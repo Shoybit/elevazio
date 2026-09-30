@@ -22,6 +22,15 @@ type Status = "idle" | "sent";
    FIELD
 ========================================================================== */
 
+/**
+ * Shared field styling for the underline inputs.
+ *
+ * `outline-none` removes the UA ring so the underline can be the resting state,
+ * but the focus ring has to be re-established explicitly — otherwise every
+ * input in this form is invisible to a keyboard user. `focus-visible` (not
+ * `focus`) keeps the ring off mouse clicks, and `focus-within` on the wrapper
+ * would be wrong here because these are direct children, not nested.
+ */
 const fieldClass = `
   h-14
   w-full
@@ -37,6 +46,10 @@ const fieldClass = `
   duration-300
   placeholder:text-black/30
   focus:border-primary
+  focus-visible:outline-2
+  focus-visible:outline-solid
+  focus-visible:outline-offset-4
+  focus-visible:outline-primary
   disabled:opacity-60
   sm:h-15
 `;
@@ -290,7 +303,7 @@ export function Contact() {
                   </p>
 
                   <a
-                    href="mailto:hello@elevazio.com"
+                    href={`mailto:${siteConfig.email}`}
                     className="
                       mt-3
                       inline-block
@@ -301,7 +314,7 @@ export function Contact() {
                       hover:text-primary
                     "
                   >
-                    hello@elevazio.com
+                    {siteConfig.email}
                   </a>
                 </div>
               </div>
@@ -417,9 +430,15 @@ export function Contact() {
 
               {/* ==========================================================
                   FORM
+
+                  `method="post"` is deliberate: with the default `get`, a
+                  submit that lands before hydration would put the visitor's
+                  name, email and phone number in the query string, where they
+                  end up in server logs, browser history and any Referer sent
+                  on to a third party.
               ========================================================== */}
 
-              <form onSubmit={handleSubmit} className="relative mt-9">
+              <form onSubmit={handleSubmit} method="post" className="relative mt-9">
                 <fieldset disabled={status === "sent"} className="contents">
                   {/* ========================================================
                       TOP FIELDS
@@ -537,26 +556,35 @@ export function Contact() {
                       rows={3}
                       disabled={status === "sent"}
                       placeholder="A few words about your project..."
-                      className="
-                        mt-3
-                        min-h-20
-                        w-full
-                        resize-none
-                        border-0
-                        border-b
-                        border-black/20
-                        bg-transparent
-                        px-0
-                        pb-4
-                        text-body-sm
-                        text-accent
-                        outline-none
-                        transition-colors
-                        duration-300
-                        placeholder:text-black/30
-                        focus:border-primary
-                        disabled:opacity-60
-                      "
+                      className={cn(
+                        "mt-3",
+                        "min-h-20",
+                        "w-full",
+                        "resize-none",
+                        "border-0",
+                        "border-b",
+                        "border-black/20",
+                        "bg-transparent",
+                        "px-0",
+                        "pb-4",
+                        "text-body-sm",
+                        "text-accent",
+                        "outline-none",
+                        "transition-colors",
+                        "duration-300",
+                        "placeholder:text-black/30",
+                        "focus:border-primary",
+                        // Same reason as `fieldClass`: the UA ring is removed,
+                        // so keyboard focus needs an explicit replacement.
+                        // `outline-solid` is required alongside `outline-2` —
+                        // `outline-none` sets the shared `--tw-outline-style`
+                        // variable, which `outline-2` then reads back as `none`.
+                        "focus-visible:outline-2",
+                        "focus-visible:outline-solid",
+                        "focus-visible:outline-offset-4",
+                        "focus-visible:outline-primary",
+                        "disabled:opacity-60",
+                      )}
                     />
                   </div>
 
@@ -740,7 +768,12 @@ function Field({
         "
       >
         {label}
-        {required ? " *" : ""}
+        {required ? (
+          <>
+            <span aria-hidden> *</span>
+            <span className="sr-only"> (required)</span>
+          </>
+        ) : null}
       </label>
 
       <input
