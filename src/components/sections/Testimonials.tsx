@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { clientNote, testimonials } from "@/config/differentiators";
@@ -16,8 +16,16 @@ const AUTOPLAY_MS = 7000;
 export function Testimonials() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
+  /**
+   * Autoplay is suspended while the visitor is reading or interacting with the
+   * carousel, and while the tab is hidden. A rotating quote that keeps
+   * advancing under a keyboard user is not operable (WCAG 2.2.2), and a
+   * background tab does not need the animation running either.
+   */
+  const [suspended, setSuspended] = useState(false);
   const reduceMotion = useReducedMotion();
   const total = testimonials.length;
+  const suspendRef = useRef(false);
 
   const goTo = useCallback(
     (next: number, dir: 1 | -1) => {
@@ -27,13 +35,29 @@ export function Testimonials() {
     [total],
   );
 
+  // Mirrored into a ref so the interval callback can read the current value
+  // without being torn down and restarted on every hover.
+  useEffect(() => {
+    suspendRef.current = suspended;
+  }, [suspended]);
+
   useEffect(() => {
     if (reduceMotion) return;
+
+    const onVisibility = () => setSuspended(document.hidden);
+    document.addEventListener("visibilitychange", onVisibility);
+    onVisibility();
+
     const timer = setInterval(() => {
+      if (suspendRef.current) return;
       setDirection(1);
       setIndex((current) => (current + 1) % total);
     }, AUTOPLAY_MS);
-    return () => clearInterval(timer);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      clearInterval(timer);
+    };
   }, [total, reduceMotion]);
 
   const active = testimonials[index];
@@ -43,6 +67,17 @@ export function Testimonials() {
       id="testimonials"
       aria-labelledby="testimonials-heading"
       className="relative isolate overflow-hidden bg-linear-to-b from-canvas to-surface-warm py-15 sm:py-25 lg:py-37.5"
+      onMouseEnter={() => setSuspended(true)}
+      onMouseLeave={() => setSuspended(false)}
+      // `focusin`/`focusout` cover keyboard users, who never produce :hover.
+      // `focusout` bubbles from any descendant, so only resume once focus has
+      // genuinely left the carousel.
+      onFocus={() => setSuspended(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setSuspended(false);
+        }
+      }}
     >
       <h2 id="testimonials-heading" className="sr-only">
         What our clients say
@@ -64,7 +99,7 @@ export function Testimonials() {
 
           <div className="relative size-22 overflow-hidden rounded-full ring-1 ring-line sm:size-24 lg:size-28">
             <Image
-              src="/images/projects/apartment-05.jpg"
+              src={active.avatar}
               alt=""
               fill
               sizes="112px"
@@ -142,7 +177,7 @@ export function Testimonials() {
                   type="button"
                   onClick={() => goTo(i, i > index ? 1 : -1)}
                   aria-label={`Show testimonial from ${item.name}`}
-                  aria-current={i === index}
+                  aria-current={i === index ? "true" : undefined}
                   className={cn(
                     "h-1.5 rounded-full transition-all duration-500",
                     i === index
