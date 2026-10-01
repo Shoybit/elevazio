@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { StructuredData } from "@/components/layout/StructuredData";
 import { PageHero } from "@/components/sections/PageHero";
 import { cn } from "@/lib/utils";
+
 export interface PageShellProps {
   eyebrow: string;
   title: string;
@@ -11,7 +12,6 @@ export interface PageShellProps {
   image: string;
   imageAlt: string;
   children: ReactNode;
-  className?: string;
   contentClassName?: string;
 }
 

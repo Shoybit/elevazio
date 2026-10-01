@@ -26,9 +26,13 @@ export function Counter({
   const inView = useInView(ref, { once: true, amount: 0.6 });
   const reduceMotion = useReducedMotion();
   const [progress, setProgress] = useState(0);
+  // `useReducedMotion` resolves to `null` on the first render and then settles
+  // to a boolean. Treating `null` as "not yet known" keeps the loop from
+  // starting and then being cancelled and restarted one tick later.
+  const motionKnown = reduceMotion !== null;
 
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || !motionKnown) return;
 
     if (reduceMotion) {
       const settled = requestAnimationFrame(() => setProgress(1));
@@ -48,7 +52,7 @@ export function Counter({
 
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [inView, duration, reduceMotion]);
+  }, [inView, duration, reduceMotion, motionKnown]);
 
   const display = reduceMotion ? value : Math.round(progress * value);
 
