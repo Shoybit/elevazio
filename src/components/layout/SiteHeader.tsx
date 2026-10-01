@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { navigation } from "@/config/navigation";
@@ -67,16 +67,18 @@ function MobileMenu({
   useEffect(() => {
     if (!open) return;
 
+    const panel = panelRef.current;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const { body } = document;
     const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
     const previousPadding = body.style.paddingRight;
+    const previousOverflow = body.style.overflow;
     body.style.overflow = "hidden";
     if (scrollBarWidth > 0) body.style.paddingRight = `${scrollBarWidth}px`;
 
     const focusables = () =>
       Array.from(
-        panelRef.current?.querySelectorAll<HTMLElement>(
+        panel?.querySelectorAll<HTMLElement>(
           'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
         ) ?? [],
       ).filter((el) => el.offsetParent !== null);
@@ -107,8 +109,13 @@ function MobileMenu({
     return () => {
       window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", onKeyDown);
-      body.style.overflow = "";
+      body.style.overflow = previousOverflow;
       body.style.paddingRight = previousPadding;
+      // Focus is trapped while the dialog is open, so it is still inside the
+      // panel at this point (and stays there through the exit animation).
+      // Restoring unconditionally is what hands focus back to the trigger; the
+      // `isConnected` guard only skips the case where the trigger itself is
+      // gone, which would throw.
       previouslyFocused?.focus();
     };
   }, [open, onClose]);
@@ -183,9 +190,12 @@ function MobileMenu({
             >
               {siteConfig.phone}
             </a>
+            {/* The panel is `bg-accent` (black), so the email needs a
+                light-on-dark tone. `text-ink-light` is tuned for the light
+                surfaces and would sit at roughly 3.7:1 here. */}
             <a
               href={`mailto:${siteConfig.email}`}
-              className="mt-1 block text-ink-light"
+              className="mt-1 block text-canvas/60"
             >
               {siteConfig.email}
             </a>
@@ -208,6 +218,11 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [route, setRoute] = useState<string | null>(null);
   const pathname = usePathname();
+
+  // Stable identity, so `MobileMenu`'s scroll-lock / focus-trap effect is not
+  // torn down and rebuilt on every unrelated header render.
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const openMenu = useCallback(() => setMenuOpen(true), []);
 
   // Derive state from the route instead of syncing it in an effect: store the
   // rendered route and only close the menu once it actually changes.
@@ -241,7 +256,7 @@ export function SiteHeader() {
 
             <button
               type="button"
-              onClick={() => setMenuOpen(true)}
+              onClick={openMenu}
               aria-label="Open navigation menu"
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
@@ -292,7 +307,7 @@ export function SiteHeader() {
         </div>
       </Container>
 
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileMenu open={menuOpen} onClose={closeMenu} />
     </header>
   );
 }

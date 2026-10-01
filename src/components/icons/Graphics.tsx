@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 /** Circular rotating text ring used behind the testimonial avatar. */
 export function CircularText({
@@ -8,7 +8,10 @@ export function CircularText({
   text: string;
   className?: string;
 }) {
-  const id = "Elevazio-circular-path";
+  // Scoped per instance: a fixed id would collide the moment a second ring is
+  // rendered on the same page, and every `textPath` would then track the first
+  // one.
+  const id = `circular-path-${useId().replace(/[^a-zA-Z0-9-]/g, "")}`;
   return (
     <svg
       viewBox="0 0 200 200"
