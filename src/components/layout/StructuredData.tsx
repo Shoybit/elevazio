@@ -2,6 +2,21 @@ import { siteConfig } from "@/config/site";
 import { services } from "@/config/services";
 
 /**
+ * Serialises the graph for inline embedding.
+ *
+ * `JSON.stringify` alone is not sufficient inside a `<script>` element: a
+ * string containing a closing script tag would terminate the element early,
+ * and an HTML comment opener would swallow the rest of the document.
+ * Rewriting every `<` as its JSON unicode escape keeps the payload valid JSON
+ * (JSON treats `<` as an ordinary character) while making both sequences
+ * unrepresentable, which closes the stored-XSS vector for schema.org values
+ * that are ever sourced from a CMS.
+ */
+function toJsonLd(graph: unknown): string {
+  return JSON.stringify(graph).replace(/</g, "\\u003c");
+}
+
+/**
  * Organization + WebSite structured data. Rendered once, inline, so search
  * engines can parse the brand, contact points and primary navigation without a
  * second network request.
@@ -67,8 +82,9 @@ export function StructuredData() {
   return (
     <script
       type="application/ld+json"
-      // Content is a static, developer-authored object — no user input involved.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
+      // Serialised from a static, developer-authored object; `toJsonLd` escapes
+      // every `<` so no value can break out of the script element.
+      dangerouslySetInnerHTML={{ __html: toJsonLd(graph) }}
     />
   );
 }
