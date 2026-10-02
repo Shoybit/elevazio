@@ -22,7 +22,23 @@
 
 # misc
 .DS_Store
+Thumbs.db
+
+# secrets and credentials — never commit these, even by accident
 *.pem
+*.key
+*.crt
+*.cer
+*.der
+*.p12
+*.pfx
+*.jks
+*.keystore
+credentials*.json
+*service-account*.json
+secrets*
+.env*
+!.env.example
 
 # debug
 npm-debug.log*
@@ -31,7 +47,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+# (covered by the secrets block above; the .env.example exception lives there)
 
 # vercel
 .vercel
